@@ -100,6 +100,15 @@ def downloadVideoBEST(url, path=None):
     ya = yt.streams.get_audio_only()
     print(f'FILESIZE: ' + str(round(ya.filesize/(1024*1024), 2)) + 'MB')
     ya.download('{0}/tmp'.format(path), filename='audio')
+        
+    # Splice video and sound together using FFMPEG
+    # !! BEWARE !! UTILIZES CPU 100%
+    va = ffmpeg.input(f'{path}tmp/audio.mp4')
+    vv = ffmpeg.input(f'{path}tmp/video.mp4')
+    ffmpeg.concat(vv, va, v=1, a=1).output(f'{path}{title}.mp4').run()
+
+    # Cleanup temp-files
+    shutil.rmtree(f'{path}tmp')
 
 
 def downloadVideoSTABLE(url, path):
